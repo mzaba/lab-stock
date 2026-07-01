@@ -66,9 +66,22 @@ export default async function Home() {
         </form>
       </header>
 
-      <Button render={<Link href="/movimientos/nuevo" />} nativeButton={false}>
-        + Registrar movimiento
-      </Button>
+      <div className="flex gap-2">
+        <Button
+          render={<Link href="/movimientos/nuevo" />}
+          nativeButton={false}
+          className="flex-1"
+        >
+          + Registrar movimiento
+        </Button>
+        <Button
+          render={<Link href="/items" />}
+          nativeButton={false}
+          variant="outline"
+        >
+          Items
+        </Button>
+      </div>
 
       {items.length === 0 && (
         <p className="mt-8 text-center text-sm text-zinc-500">
