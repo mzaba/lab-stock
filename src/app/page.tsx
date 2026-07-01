@@ -81,6 +81,13 @@ export default async function Home() {
         >
           Items
         </Button>
+        <Button
+          render={<Link href="/pedidos" />}
+          nativeButton={false}
+          variant="outline"
+        >
+          Pedidos
+        </Button>
       </div>
 
       {items.length === 0 && (
