@@ -3,7 +3,23 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const PUBLIC_PATHS = ["/login", "/forgot-password", "/auth/confirm", "/reset-password"];
 
+const ASSET_EXTENSIONS = /\.(?:svg|png|jpg|jpeg|gif|webp|ico)$/;
+
+function isAssetPath(pathname: string) {
+  return (
+    pathname.startsWith("/_next/") ||
+    pathname === "/manifest.webmanifest" ||
+    pathname === "/sw.js" ||
+    pathname.startsWith("/icons/") ||
+    ASSET_EXTENSIONS.test(pathname)
+  );
+}
+
 export async function updateSession(request: NextRequest) {
+  if (isAssetPath(request.nextUrl.pathname)) {
+    return NextResponse.next({ request });
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(

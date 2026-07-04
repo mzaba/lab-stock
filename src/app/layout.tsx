@@ -13,17 +13,18 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
 export const metadata: Metadata = {
   title: "Lab Stock",
   description: "Control de stock para el equipo de guardia del laboratorio de hematología",
-  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "Lab Stock",
   },
   icons: {
-    apple: "/icons/apple-touch-icon.png",
+    apple: `${basePath}/icons/apple-touch-icon.png`,
   },
 };
 

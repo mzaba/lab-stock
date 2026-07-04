@@ -17,7 +17,8 @@ export async function solicitarRecuperacion(
   const headerList = await headers();
   const host = headerList.get("host");
   const protocol = host?.startsWith("localhost") ? "http" : "https";
-  const origin = `${protocol}://${host}`;
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+  const origin = `${protocol}://${host}${basePath}`;
 
   const supabase = await createClient();
   await supabase.auth.resetPasswordForEmail(email, {
