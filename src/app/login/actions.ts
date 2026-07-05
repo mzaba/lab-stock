@@ -1,18 +1,29 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
-export async function login(formData: FormData) {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
+export async function loginWithGoogle() {
+  const headerList = await headers();
+  const host = headerList.get("host");
+  const protocol = host?.startsWith("localhost") ? "http" : "https";
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+  const origin = `${protocol}://${host}${basePath}`;
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${origin}/auth/confirm?next=${encodeURIComponent(`${basePath}/`)}`,
+    },
+  });
 
-  if (error) {
-    return { error: "Email o contraseña incorrectos." };
+  if (error || !data.url) {
+    redirect(
+      "/login?error=" + encodeURIComponent("No se pudo iniciar sesión con Google. Probá de nuevo."),
+    );
   }
 
-  redirect("/");
+  redirect(data.url);
 }

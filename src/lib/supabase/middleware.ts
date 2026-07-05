@@ -1,7 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { AUTHORIZED_EMAILS } from "@/lib/authorized-emails";
 
-const PUBLIC_PATHS = ["/login", "/forgot-password", "/auth/confirm", "/reset-password"];
+const PUBLIC_PATHS = ["/login", "/auth/confirm", "/no-autorizado"];
 
 const ASSET_EXTENSIONS = /\.(?:svg|png|jpg|jpeg|gif|webp|ico)$/;
 
@@ -48,6 +49,16 @@ export async function updateSession(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
 
   const isPublicPath = PUBLIC_PATHS.includes(request.nextUrl.pathname);
+
+  // No hay registro público — solo entra el equipo de la allowlist. Un
+  // Google login válido pero no autorizado se cierra en el acto en vez de
+  // dejarlo pasar con una sesión activa pero sin acceso a nada útil.
+  if (user && !AUTHORIZED_EMAILS.includes(user.email ?? "")) {
+    await supabase.auth.signOut();
+    const deniedUrl = request.nextUrl.clone();
+    deniedUrl.pathname = "/no-autorizado";
+    return NextResponse.redirect(deniedUrl);
+  }
 
   if (!user && !isPublicPath) {
     const loginUrl = request.nextUrl.clone();

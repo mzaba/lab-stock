@@ -1,11 +1,5 @@
-"use client";
-
-import { useActionState } from "react";
-import Link from "next/link";
-import { login } from "./actions";
+import { loginWithGoogle } from "./actions";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -14,14 +8,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-type LoginState = { error?: string } | undefined;
-
-async function loginAction(_prevState: LoginState, formData: FormData) {
-  return login(formData);
-}
-
-export default function LoginPage() {
-  const [state, formAction, isPending] = useActionState(loginAction, undefined);
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
@@ -30,31 +22,17 @@ export default function LoginPage() {
           <CardTitle>Lab Stock</CardTitle>
           <CardDescription>Ingresá para registrar movimientos de stock.</CardDescription>
         </CardHeader>
-        <CardContent>
-          <form action={formAction} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" type="email" required autoComplete="username" />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="password">Contraseña</Label>
-              <Input id="password" name="password" type="password" required autoComplete="current-password" />
-            </div>
-            {state?.error && (
-              <p className="text-sm text-red-600" role="alert">
-                {state.error}
-              </p>
-            )}
-            <Button type="submit" disabled={isPending}>
-              {isPending ? "Ingresando..." : "Ingresar"}
+        <CardContent className="flex flex-col gap-4">
+          {error && (
+            <p className="text-sm text-red-600" role="alert">
+              {error}
+            </p>
+          )}
+          <form action={loginWithGoogle}>
+            <Button type="submit" className="w-full">
+              Ingresar con Google
             </Button>
           </form>
-          <Link
-            href="/forgot-password"
-            className="mt-3 block text-center text-sm text-muted-foreground underline-offset-4 hover:underline"
-          >
-            ¿Olvidaste tu contraseña?
-          </Link>
         </CardContent>
       </Card>
     </div>
